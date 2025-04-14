@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const CycloneSchema = new mongoose.Schema({
+const DisasterEventSchema = new mongoose.Schema({
   "DisNo.": String,
   "Historic": String,
   "Classification Key": String,
@@ -23,14 +23,8 @@ const CycloneSchema = new mongoose.Schema({
   "AID Contribution ('000 US$)": mongoose.Schema.Types.Mixed,
   "Magnitude": mongoose.Schema.Types.Mixed,
   "Magnitude Scale": String,
-  "latitude":{
-    type: Number,
-    required: false // or true, if you always expect it
-  },
-  "longitude": {
-    type: Number,
-    required: false
-  },
+  "Latitude": Number,
+  "Longitude": Number,
   "River Basin": mongoose.Schema.Types.Mixed,
   "Start Year": Number,
   "Start Month": Number,
@@ -54,8 +48,8 @@ const CycloneSchema = new mongoose.Schema({
   "Entry Date": String,
   "Last Update": String
 }, {
-  collection: 'cyclone_events',
   strict: true
 });
 
-module.exports = mongoose.model('Cyclone', CycloneSchema);
+// ✅ Return a new model bound to the given collection
+module.exports = (collectionName) => mongoose.model(collectionName, DisasterEventSchema, collectionName);
