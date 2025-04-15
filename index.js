@@ -2,44 +2,48 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const disasterRoutes = require('./routes/disaster'); // ✅ Import disaster route
 
+// Load environment variables
 dotenv.config();
+
+// Import routes
+const disasterRoutes = require('./routes/disaster');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-app.use(cors());
+// ✅ Middleware
+app.use(cors({ origin: '*', credentials: true }));
 app.use(express.json());
 
-// Optional request logger
+// ✅ Logger middleware (good for development)
 app.use((req, res, next) => {
-  console.log(`[${req.method}] ${req.url}`);
+  console.log(`[${req.method}] ${req.originalUrl}`);
   next();
 });
 
-// MongoDB connection
+// ✅ MongoDB connection
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 15000,
 })
-  .then(() => console.log("✅ Connected to MongoDB"))
-  .catch(err => console.error("❌ MongoDB connection error:", err));
+  .then(() => console.log('✅ Connected to MongoDB'))
+  .catch(err => console.error('❌ MongoDB connection error:', err));
 
-// Routes
+// ✅ Routes
 app.get('/', (req, res) => {
-  res.send('🌪️ Disaster backend running ...');
+  res.send('🌪️ Disaster backend is live!');
 });
 
+app.use('/api/disaster', disasterRoutes);
+
+// Optional test route
 app.get('/api/stats', (req, res) => {
   res.json({ message: '📊 Stats endpoint is working!' });
 });
 
-app.use('/api/disaster', disasterRoutes); // ✅ The only necessary route
-
-// Start server
+// ✅ Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server running on http://localhost:${PORT}`);
+  console.log(`🚀 Server running at http://localhost:${PORT}`);
 });

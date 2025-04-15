@@ -51,5 +51,7 @@ const DisasterEventSchema = new mongoose.Schema({
   strict: true
 });
 
-// ✅ Return a new model bound to the given collection
-module.exports = (collectionName) => mongoose.model(collectionName, DisasterEventSchema, collectionName);
+// ✅ Prevent model overwrite on dev hot-reload
+module.exports = (collectionName) => {
+  return mongoose.models[collectionName] || mongoose.model(collectionName, DisasterEventSchema, collectionName);
+};

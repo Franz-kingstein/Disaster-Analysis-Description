@@ -1,8 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const mongoose = require('mongoose');
-const getDisasterModel = require('../models/Cyclone'); // Adjust the path as necessary
+const getDisasterModel = require('../models/Cyclone'); // This function should return a dynamic Mongoose model
 
+const disasterCollections = {
+  cyclone: 'cyclone_events',
+  earthquake: 'earthquake_events',
+  flood: 'flood_events',
+  drought: 'drought_events',
+  forestfire: 'forestfire_events' // ✅ Add this
+};
+
+
+// Default root response
 router.get('/', (req, res, next) => {
   if (!req.query.type) {
     return res.status(200).json({ message: '🛰️ Disaster API is live. Use ?type=&year=' });
@@ -10,13 +19,7 @@ router.get('/', (req, res, next) => {
   next();
 });
 
-const disasterCollections = {
-  cyclone: 'cyclone_events',
-  earthquake: 'earthquake_events',
-  flood: 'flood_events',
-  drought: 'drought_events',
-};
-
+// Main disaster data handler
 router.get('/', async (req, res) => {
   try {
     const year = parseInt(req.query.year);
@@ -40,13 +43,14 @@ router.get('/', async (req, res) => {
 
     const events = rawEvents.map(event => ({
       id: event._id,
-      name: event["Event Name"] || event["Disaster Subtype"] || "Unnamed Event",      location: event["Location"] || "N/A",
+      name: event["Event Name"] || event["Disaster Subtype"] || "Unnamed Event",
+      location: event["Location"] || "N/A",
       country: event["Country"] || "N/A",
       disasterType: event["Disaster Type"] || "N/A",
       disasterSubtype: event["Disaster Subtype"] || "N/A",
       magnitude: event["Magnitude"] || "N/A",
-      affected: event["Total Affected"] || "N/A",
-      deaths: event["Total Deaths"] || "N/A",
+      deaths: isNaN(parseInt(event["Total Deaths"])) ? 0 : parseInt(event["Total Deaths"]),
+      affected: isNaN(parseInt(event["Total Affected"])) ? 0 : parseInt(event["Total Affected"]),
       date: event.date || (
         event["Start Year"] && event["Start Month"] && event["Start Day"]
           ? `${event["Start Day"]}-${event["Start Month"]}-${event["Start Year"]}`
