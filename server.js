@@ -12,7 +12,7 @@ const MONGO_URI = process.env.MONGO_URI;
 
 // ✅ Middleware
 app.use(cors({
-  origin: 'http://localhost:3000', // Frontend URL
+  origin: '*', // Frontend URL
   credentials: true
 }));
 app.use(express.json());
